@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CodeBuild Project for CI/CD Pipeline'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: 'cicd-build-project'
+    Description: 'Name of the CodeBuild project'
+
+Resources:
+  # S3 Bucket for CodeBuild artifacts
+  CodeBuildArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'codebuild-artifacts-${AWS::AccountId}-${AWS::Region}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # CodeBuild Project
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Ref ProjectName
+      Description: 'Build project for CI/CD pipeline'
+      ServiceRole: 
+        Fn::ImportValue: 'cicd-iam-roles-CodeBuildServiceRoleArn'
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_MEDIUM
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref AWS::Region
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
+          - Name: ARTIFACTS_BUCKET
+            Value: !Ref CodeBuildArtifactsBucket
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: |
+          version: 0.2
+          phases:
+            install:
+              runtime-versions:
+                nodejs: 18
+                python: 3.9
+            pre_build:
+              commands:
+                - echo Pre-build phase started on `date`
+                - echo Running tests...
+            build:
+              commands:
+                - echo Build phase started on `date`
+                - echo Building the application...
+                - mkdir -p build
+                - cp -r . build/ || echo "Copying files"
+            post_build:
+              commands:
+                - echo Post-build phase completed on `date`
+          artifacts:
+            files:
+              - '**/*'
+            base-directory: build
+      TimeoutInMinutes: 15
+
+Outputs:
+  CodeBuildProjectName:
+    Description: 'Name of the CodeBuild project'
+    Value: !Ref CodeBuildProject
+    Export:
+      Name: !Sub '${AWS::StackName}-CodeBuildProjectName'
+      
+  CodeBuildArtifactsBucket:
+    Description: 'S3 bucket for CodeBuild artifacts'
+    Value: !Ref CodeBuildArtifactsBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-CodeBuildArtifactsBucket'

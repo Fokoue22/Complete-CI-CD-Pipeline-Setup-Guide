@@ -1,0 +1,200 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CodePipeline for CI/CD Pipeline'
+
+Parameters:
+  GitHubOwner:
+    Type: String
+    Description: 'GitHub repository owner'
+    
+  GitHubRepo:
+    Type: String
+    Description: 'GitHub repository name'
+    
+  GitHubBranch:
+    Type: String
+    Default: 'main'
+    Description: 'GitHub branch to track'
+    
+  GitHubToken:
+    Type: String
+    NoEcho: true
+    Description: 'GitHub personal access token'
+
+Resources:
+  # S3 Bucket for CodePipeline artifacts
+  CodePipelineArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'codepipeline-artifacts-${AWS::AccountId}-${AWS::Region}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # CodePipeline
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: 'cicd-pipeline'
+      RoleArn: 
+        Fn::ImportValue: 'cicd-iam-roles-CodePipelineServiceRoleArn'
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineArtifactsBucket
+      Stages:
+        # Source Stage
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: '1'
+              Configuration:
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepo
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubToken
+                PollForSourceChanges: false
+              OutputArtifacts:
+                - Name: SourceOutput
+                
+        # Build Stage
+        - Name: Build
+          Actions:
+            - Name: BuildAction
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: 
+                  Fn::ImportValue: 'cicd-codebuild-CodeBuildProjectName'
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+                
+        # Deploy DEV Stage (us-east-1)
+        - Name: Deploy-DEV
+          Actions:
+            - Name: CreateChangeSet-DEV
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                StackName: 'cicd-app-dev-stack'
+                ChangeSetName: 'cicd-app-dev-changeset'
+                TemplatePath: 'BuildOutput::app-infrastructure.yaml'
+                Capabilities: CAPABILITY_IAM
+                RoleArn: 
+                  Fn::ImportValue: 'cicd-iam-roles-CloudFormationServiceRoleArn'
+                ParameterOverrides: |
+                  {
+                    "Environment": "dev"
+                  }
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+              Region: us-east-1
+              
+            - Name: ExecuteChangeSet-DEV
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: 'cicd-app-dev-stack'
+                ChangeSetName: 'cicd-app-dev-changeset'
+              RunOrder: 2
+              Region: us-east-1
+
+        # Manual Approval Stage
+        - Name: Manual-Approval
+          Actions:
+            - Name: ManualApproval
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: '1'
+              Configuration:
+                CustomData: 'Please review the DEV deployment and approve for PROD deployment to us-west-1'
+
+        # Deploy PROD Stage (us-west-1)
+        - Name: Deploy-PROD
+          Actions:
+            - Name: CreateChangeSet-PROD
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                StackName: 'cicd-app-prod-stack'
+                ChangeSetName: 'cicd-app-prod-changeset'
+                TemplatePath: 'BuildOutput::app-infrastructure.yaml'
+                Capabilities: CAPABILITY_IAM
+                RoleArn: 
+                  Fn::ImportValue: 'cicd-iam-roles-CloudFormationServiceRoleArn'
+                ParameterOverrides: |
+                  {
+                    "Environment": "prod"
+                  }
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+              Region: us-west-1
+              
+            - Name: ExecuteChangeSet-PROD
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: 'cicd-app-prod-stack'
+                ChangeSetName: 'cicd-app-prod-changeset'
+              RunOrder: 2
+              Region: us-west-1
+
+  # GitHub Webhook
+  GitHubWebhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties:
+      Name: 'cicd-github-webhook'
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: !Ref GitHubToken
+      Filters:
+        - JsonPath: '$.ref'
+          MatchEquals: !Sub 'refs/heads/${GitHubBranch}'
+      TargetPipeline: !Ref CodePipeline
+      TargetAction: SourceAction
+      TargetPipelineVersion: !GetAtt CodePipeline.Version
+      RegisterWithThirdParty: true
+
+Outputs:
+  CodePipelineName:
+    Description: 'Name of the CodePipeline'
+    Value: !Ref CodePipeline
+    Export:
+      Name: !Sub '${AWS::StackName}-CodePipelineName'
+      
+  CodePipelineArtifactsBucket:
+    Description: 'S3 bucket for CodePipeline artifacts'
+    Value: !Ref CodePipelineArtifactsBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-CodePipelineArtifactsBucket'

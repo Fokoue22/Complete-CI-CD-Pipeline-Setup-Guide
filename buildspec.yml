@@ -1,0 +1,46 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+      python: 3.9
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - echo Build started on `date`
+      - echo Installing dependencies...
+      
+  pre_build:
+    commands:
+      - echo Pre-build phase started on `date`
+      - echo Running tests...
+      - # Add your test commands here
+      - echo Tests completed successfully
+      
+  build:
+    commands:
+      - echo Build phase started on `date`
+      - echo Building the application...
+      - # Add your build commands here
+      - echo Creating deployment package...
+      - mkdir -p build
+      - cp -r src/* build/ || echo "No src directory found"
+      - cp infrastructure/app-infrastructure.yaml build/
+      
+  post_build:
+    commands:
+      - echo Post-build phase started on `date`
+      - echo Build completed on `date`
+      - echo Preparing artifacts...
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: build
+  name: BuildArtifact
+
+cache:
+  paths:
+    - '/root/.npm/**/*'
+    - '/root/.cache/pip/**/*'

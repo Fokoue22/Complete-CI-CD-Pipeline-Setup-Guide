@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD Pipeline Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 CI/CD Pipeline Demo</h1>
+        
+        <div class="status">
+            ✅ Application Successfully Deployed!
+        </div>
+        
+        <div class="info">
+            <h3>Pipeline Components:</h3>
+            <ul>
+                <li><strong>GitHub:</strong> Source code repository</li>
+                <li><strong>AWS CodePipeline:</strong> Orchestration</li>
+                <li><strong>AWS CodeBuild:</strong> Build and test</li>
+                <li><strong>AWS CloudFormation:</strong> Infrastructure deployment</li>
+            </ul>
+        </div>
+        
+        <div class="info">
+            <h3>Deployment Information:</h3>
+            <p><strong>Environment:</strong> Development</p>
+            <p><strong>Build Date:</strong> <span id="buildDate"></span></p>
+            <p><strong>Version:</strong> 1.0.0</p>
+        </div>
+        
+        <div class="info">
+            <h3>Next Steps:</h3>
+            <ol>
+                <li>Make changes to your code</li>
+                <li>Push to GitHub</li>
+                <li>Watch the pipeline automatically deploy your changes</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('buildDate').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
