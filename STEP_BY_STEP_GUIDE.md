@@ -36,17 +36,17 @@ This guide will walk you through setting up a complete CI/CD pipeline using:
        - Give it a descriptive name: AWS-CodePipeline-Token
        - Set expiration (recommend 30-90 days for security)
    - Select Required Scopes:
-   ✅ repo (Full control of private repositories)
-       ✅ repo:status
-       ✅ repo_deployment  
-       ✅ public_repo
-   ✅ admin:repo_hook (for webhook management)
-       ✅ write:repo_hook
-       ✅ read:repo_hook
+     - ✅ repo (Full control of private repositories)
+       - ✅ repo:status
+       - ✅ repo_deployment  
+       - ✅ public_repo
+     - ✅ admin:repo_hook (for webhook management)
+       - ✅ write:repo_hook
+       - ✅ read:repo_hook
 
    - Save the token securely (you'll need it later)
    - Security Best Practices: Store the token in a password manager
-   # Store securely in AWS Systems Manager Parameter Store
+   #### Store securely in AWS Systems Manager Parameter Store
        aws ssm put-parameter \
         --name "/cicd/github-token" \
         --description "GitHub token for CodePipeline"
