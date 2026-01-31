@@ -45,7 +45,15 @@ This guide will walk you through setting up a complete CI/CD pipeline using:
        ✅ read:repo_hook
 
    - Save the token securely (you'll need it later)
-   - 
+   - Security Best Practices: Store the token in a password manager
+   # Store securely in AWS Systems Manager Parameter Store
+       aws ssm put-parameter \
+        --name "/cicd/github-token" \
+        --description "GitHub token for CodePipeline"
+        --type "SecureString" \
+        --value "ghp_your_token_here" \
+        
+
 
 3. **Clone your repository locally:**
    ```bash
