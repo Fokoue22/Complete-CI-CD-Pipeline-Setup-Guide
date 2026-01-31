@@ -30,9 +30,22 @@ This guide will walk you through setting up a complete CI/CD pipeline using:
 
 1. **Create a new GitHub repository** or use an existing one
 2. **Generate a Personal Access Token:**
-   - Go to GitHub Settings → Developer settings → Personal access tokens
+   - Go to GitHub Settings → Developer settings → Personal access tokens → "Tokens (classic)"
    - Generate new token with `repo` permissions
+       - Click "Generate new token (classic)"
+       - Give it a descriptive name: AWS-CodePipeline-Token
+       - Set expiration (recommend 30-90 days for security)
+   - Select Required Scopes:
+   ✅ repo (Full control of private repositories)
+       ✅ repo:status
+       ✅ repo_deployment  
+       ✅ public_repo
+   ✅ admin:repo_hook (for webhook management)
+       ✅ write:repo_hook
+       ✅ read:repo_hook
+
    - Save the token securely (you'll need it later)
+   - 
 
 3. **Clone your repository locally:**
    ```bash
