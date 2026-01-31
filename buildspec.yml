@@ -26,14 +26,12 @@ phases:
       - ls -la
       - echo "Infrastructure directory contents:"
       - ls -la infrastructure/
-      - echo Creating deployment package...
-      - mkdir -p build
-      - echo "Copying source files..."
-      - if [ -d "src" ]; then cp -r src/* build/; else echo "No src directory found"; fi
-      - echo "Copying infrastructure template..."
-      - cp infrastructure/app-infrastructure.yaml build/app-infrastructure.yaml
-      - echo "Build directory contents after copy:"
-      - ls -la build/
+      - echo "Copying app-infrastructure.yaml to root for CloudFormation..."
+      - cp infrastructure/app-infrastructure.yaml ./app-infrastructure.yaml
+      - echo "Root directory contents after copy:"
+      - ls -la
+      - echo "Verifying app-infrastructure.yaml exists:"
+      - cat app-infrastructure.yaml | head -5
       
   post_build:
     commands:
@@ -44,7 +42,6 @@ phases:
 artifacts:
   files:
     - '**/*'
-  base-directory: build
   name: BuildArtifact
 
 cache:
