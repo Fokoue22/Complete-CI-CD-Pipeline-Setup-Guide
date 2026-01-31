@@ -162,6 +162,11 @@ This guide will walk you through setting up a complete CI/CD pipeline using:
    - Push to GitHub
    - Watch the pipeline automatically trigger
 
+2. **Test your Lambda function:**
+   ```
+   aws lambda invoke --function-name cicd-hello-world-dev --region us-east-1 response.json
+   ```
+
 ### Step 6: Monitor and Troubleshoot
 
 1. **Pipeline Monitoring:**
