@@ -22,13 +22,17 @@ phases:
     commands:
       - echo Build phase started on `date`
       - echo Building the application...
+      - echo "Current directory contents:"
+      - ls -la
+      - echo "Infrastructure directory contents:"
+      - ls -la infrastructure/
       - echo Creating deployment package...
       - mkdir -p build
       - echo "Copying source files..."
-      - cp -r src/* build/ 2>/dev/null || echo "No src directory found, creating basic structure"
+      - if [ -d "src" ]; then cp -r src/* build/; else echo "No src directory found"; fi
       - echo "Copying infrastructure template..."
-      - cp infrastructure/app-infrastructure.yaml build/ || echo "Could not find app-infrastructure.yaml"
-      - echo "Listing build directory contents:"
+      - cp infrastructure/app-infrastructure.yaml build/app-infrastructure.yaml
+      - echo "Build directory contents after copy:"
       - ls -la build/
       
   post_build:
