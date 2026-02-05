@@ -121,9 +121,6 @@ See [STEP_BY_STEP_GUIDE.md](STEP_BY_STEP_GUIDE.md) for manual deployment steps.
 
 | Document | Description | When to Use |
 |----------|-------------|-------------|
-| [QUICK_REFERENCE.md](QUICK_REFERENCE.md) | Command cheat sheet | Quick lookups |
-| [QUICK_START_MULTI_REGION.md](QUICK_START_MULTI_REGION.md) | Fast setup guide | First-time setup |
 | [DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md) | Overview & checklist | Understanding the setup |
 | [MULTI_REGION_DEPLOYMENT.md](MULTI_REGION_DEPLOYMENT.md) | Complete guide | Detailed information |
 | [CHANGES_MULTI_REGION.md](CHANGES_MULTI_REGION.md) | Change log | Migration from old setup |
-| [STEP_BY_STEP_GUIDE.md](STEP_BY_STEP_GUIDE.md) | Original guide | Single-region setup |

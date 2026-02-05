@@ -21,31 +21,6 @@ Parameters:
     Description: 'GitHub personal access token'
 
 Resources:
-  # S3 Bucket for CodePipeline artifacts in us-east-1
-  CodePipelineArtifactsBucketEast:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-east-1'
-      VersioningConfiguration:
-        Status: Enabled
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-
-  # S3 Bucket for CodePipeline artifacts in us-west-1
-  CodePipelineArtifactsBucketWest:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-west-1'
-      VersioningConfiguration:
-        Status: Enabled
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
 
   # CodePipeline with multi-region support
   CodePipeline:
@@ -58,11 +33,11 @@ Resources:
         - Region: us-east-1
           ArtifactStore:
             Type: S3
-            Location: !Ref CodePipelineArtifactsBucketEast
+            Location: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-east-1'
         - Region: us-west-1
           ArtifactStore:
             Type: S3
-            Location: !Ref CodePipelineArtifactsBucketWest
+            Location: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-west-1'
       Stages:
         # Source Stage
         - Name: Source
@@ -215,12 +190,12 @@ Outputs:
       
   CodePipelineArtifactsBucketEast:
     Description: 'S3 bucket for CodePipeline artifacts in us-east-1'
-    Value: !Ref CodePipelineArtifactsBucketEast
+    Value: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-east-1'
     Export:
       Name: !Sub '${AWS::StackName}-CodePipelineArtifactsBucketEast'
 
   CodePipelineArtifactsBucketWest:
     Description: 'S3 bucket for CodePipeline artifacts in us-west-1'
-    Value: !Ref CodePipelineArtifactsBucketWest
+    Value: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-west-1'
     Export:
       Name: !Sub '${AWS::StackName}-CodePipelineArtifactsBucketWest'
