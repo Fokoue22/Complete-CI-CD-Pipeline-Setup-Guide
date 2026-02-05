@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Hello from CI/CD Pipeline!\", \"environment\": \"dev\", \"timestamp\": \"89cfe289-67fa-464a-b03d-4dfca683cb85\"}"}

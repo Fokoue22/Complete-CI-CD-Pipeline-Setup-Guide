@@ -55,20 +55,29 @@ Resources:
             pre_build:
               commands:
                 - echo Pre-build phase started on `date`
-                - echo Running tests...
+                - echo Current directory contents
+                - ls -la
+                - echo Infrastructure directory contents
+                - ls -la infrastructure/
             build:
               commands:
                 - echo Build phase started on `date`
-                - echo Building the application...
-                - mkdir -p build
-                - cp -r . build/ || echo "Copying files"
+                - echo Copying CloudFormation template to root
+                - cp infrastructure/app-infrastructure.yaml ./app-infrastructure.yaml
+                - echo Verifying file exists
+                - ls -la app-infrastructure.yaml
+                - echo File contents preview
+                - head -10 app-infrastructure.yaml
             post_build:
               commands:
                 - echo Post-build phase completed on `date`
+                - echo Final directory contents
+                - ls -la
           artifacts:
             files:
-              - '**/*'
-            base-directory: build
+              - app-infrastructure.yaml
+              - src/**/*
+            name: BuildArtifact
       TimeoutInMinutes: 15
 
 Outputs:

@@ -21,11 +21,11 @@ Parameters:
     Description: 'GitHub personal access token'
 
 Resources:
-  # S3 Bucket for CodePipeline artifacts
-  CodePipelineArtifactsBucket:
+  # S3 Bucket for CodePipeline artifacts in us-east-1
+  CodePipelineArtifactsBucketEast:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub 'codepipeline-artifacts-${AWS::AccountId}-${AWS::Region}'
+      BucketName: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-east-1'
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
@@ -34,16 +34,35 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  # CodePipeline
+  # S3 Bucket for CodePipeline artifacts in us-west-1
+  CodePipelineArtifactsBucketWest:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'codepipeline-artifacts-${AWS::AccountId}-us-west-1'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # CodePipeline with multi-region support
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: 'cicd-pipeline'
       RoleArn: 
         Fn::ImportValue: 'cicd-iam-roles-CodePipelineServiceRoleArn'
-      ArtifactStore:
-        Type: S3
-        Location: !Ref CodePipelineArtifactsBucket
+      ArtifactStores:
+        - Region: us-east-1
+          ArtifactStore:
+            Type: S3
+            Location: !Ref CodePipelineArtifactsBucketEast
+        - Region: us-west-1
+          ArtifactStore:
+            Type: S3
+            Location: !Ref CodePipelineArtifactsBucketWest
       Stages:
         # Source Stage
         - Name: Source
@@ -80,10 +99,10 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
                 
-        # Deploy Stage (us-east-1 only for now)
-        - Name: Deploy
+        # Deploy Dev Stage (us-east-1)
+        - Name: DeployDev
           Actions:
-            - Name: CreateChangeSet
+            - Name: CreateChangeSetDev
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -91,8 +110,8 @@ Resources:
                 Version: '1'
               Configuration:
                 ActionMode: CHANGE_SET_REPLACE
-                StackName: 'cicd-app-stack'
-                ChangeSetName: 'cicd-app-changeset'
+                StackName: 'cicd-app-stack-dev'
+                ChangeSetName: 'cicd-app-changeset-dev'
                 TemplatePath: 'BuildOutput::app-infrastructure.yaml'
                 Capabilities: CAPABILITY_IAM
                 RoleArn: 
@@ -103,9 +122,10 @@ Resources:
                   }
               InputArtifacts:
                 - Name: BuildOutput
+              Region: us-east-1
               RunOrder: 1
               
-            - Name: ExecuteChangeSet
+            - Name: ExecuteChangeSetDev
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -113,8 +133,61 @@ Resources:
                 Version: '1'
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
-                StackName: 'cicd-app-stack'
-                ChangeSetName: 'cicd-app-changeset'
+                StackName: 'cicd-app-stack-dev'
+                ChangeSetName: 'cicd-app-changeset-dev'
+              Region: us-east-1
+              RunOrder: 2
+
+        # Manual Approval Stage
+        - Name: ManualApproval
+          Actions:
+            - Name: ApprovalForProduction
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: '1'
+              Configuration:
+                CustomData: 'Please review the Dev deployment in us-east-1 and approve for Production deployment to us-west-1'
+                ExternalEntityLink: !Sub 'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?stackId=cicd-app-stack-dev'
+
+        # Deploy Prod Stage (us-west-1)
+        - Name: DeployProd
+          Actions:
+            - Name: CreateChangeSetProd
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                StackName: 'cicd-app-stack-prod'
+                ChangeSetName: 'cicd-app-changeset-prod'
+                TemplatePath: 'BuildOutput::app-infrastructure.yaml'
+                Capabilities: CAPABILITY_IAM
+                RoleArn: 
+                  Fn::ImportValue: 'cicd-iam-roles-CloudFormationServiceRoleArn'
+                ParameterOverrides: |
+                  {
+                    "Environment": "prod"
+                  }
+              InputArtifacts:
+                - Name: BuildOutput
+              Region: us-west-1
+              RunOrder: 1
+              
+            - Name: ExecuteChangeSetProd
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: 'cicd-app-stack-prod'
+                ChangeSetName: 'cicd-app-changeset-prod'
+              Region: us-west-1
               RunOrder: 2
 
   # GitHub Webhook
@@ -140,8 +213,14 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-CodePipelineName'
       
-  CodePipelineArtifactsBucket:
-    Description: 'S3 bucket for CodePipeline artifacts'
-    Value: !Ref CodePipelineArtifactsBucket
+  CodePipelineArtifactsBucketEast:
+    Description: 'S3 bucket for CodePipeline artifacts in us-east-1'
+    Value: !Ref CodePipelineArtifactsBucketEast
     Export:
-      Name: !Sub '${AWS::StackName}-CodePipelineArtifactsBucket'
+      Name: !Sub '${AWS::StackName}-CodePipelineArtifactsBucketEast'
+
+  CodePipelineArtifactsBucketWest:
+    Description: 'S3 bucket for CodePipeline artifacts in us-west-1'
+    Value: !Ref CodePipelineArtifactsBucketWest
+    Export:
+      Name: !Sub '${AWS::StackName}-CodePipelineArtifactsBucketWest'
