@@ -222,32 +222,8 @@ git push origin main
 | Prod Stack | us-west-1 | Production environment |
 
 ### Pipeline Stages
+![Alt text](images/Pipeline-view.png)
 
-```
-┌─────────────┐
-│   GitHub    │ ← You push code here
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│    Build    │ ← CodeBuild compiles & tests
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Deploy Dev │ ← Automatic (us-east-1)
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Approval   │ ← YOU REVIEW & APPROVE
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Deploy Prod │ ← After approval (us-west-1)
-└─────────────┘
-```
 
 ## Customization
 
@@ -347,6 +323,8 @@ aws cloudformation describe-stacks \
   --stack-name cicd-app-stack-prod \
   --region us-west-1
 ```
+### Multi-Region CI/CD Pipeline Deployment Guide
+![Alt text](images/prod-stack.png)
 
 ## Cleanup
 

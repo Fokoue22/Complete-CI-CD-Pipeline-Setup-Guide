@@ -1,4 +1,4 @@
-# 🚀 Complete Multi-Region CI/CD Pipeline
+# Complete Multi-Region CI/CD Pipeline
 
 [![AWS](https://img.shields.io/badge/AWS-CodePipeline-orange)](https://aws.amazon.com/codepipeline/)
 [![GitHub](https://img.shields.io/badge/GitHub-Integration-blue)](https://github.com)
@@ -7,20 +7,20 @@
 
 > **Production-ready CI/CD pipeline with multi-region deployment and manual approval gates**
 
-### 🎯 New Here? [START HERE →](START_HERE.md)
+### New Here? [START HERE →](START_HERE.md)
 
 ### Architecture Review
 ![Alt text](images/3stage-architecture-cloudformation.png)
 
 This is a **complete, ready-to-use** CI/CD pipeline featuring:
-- ✅ **GitHub** for source control with webhook integration
-- ✅ **AWS CodePipeline** for orchestration
-- ✅ **AWS CodeBuild** for automated build/test
-- ✅ **AWS CloudFormation** for Infrastructure as Code
-- ✅ **Multi-Region Deployment** (Dev: us-east-1, Prod: us-west-1)
-- ✅ **Manual Approval** gate before production
-- ✅ **Complete Documentation** for every scenario
-- ✅ **Automated Deployment Scripts** (PowerShell & Bash)
+- **GitHub** for source control with webhook integration
+- **AWS CodePipeline** for orchestration
+- **AWS CodeBuild** for automated build/test
+- **AWS CloudFormation** for Infrastructure as Code
+- **Multi-Region Deployment** (Dev: us-east-1, Prod: us-west-1)
+- **Manual Approval** gate before production
+- **Complete Documentation** for every scenario
+- **Automated Deployment Scripts** (PowerShell & Bash)
 
 ## Architecture Flow
 
@@ -35,10 +35,7 @@ This is a **complete, ready-to-use** CI/CD pipeline featuring:
 ## Deployment Options
 
 ### Single Region Deployment
-For basic setup with deployment to a single region, follow the [STEP_BY_STEP_GUIDE.md](STEP_BY_STEP_GUIDE.md)
-
-### Multi-Region Deployment (Recommended)
-For production-ready setup with Dev (us-east-1) and Prod (us-west-1) with manual approval, see [MULTI_REGION_DEPLOYMENT.md](MULTI_REGION_DEPLOYMENT.md)
+For basic setup with deployment to a single region, follow the [START_HERE.md](START_HERE.md)
 
 ## Quick Start
 
@@ -59,7 +56,7 @@ git push origin main
 # 4. Approve in AWS Console when ready for Prod
 ```
 
-See [QUICK_START_MULTI_REGION.md](QUICK_START_MULTI_REGION.md) for detailed instructions.
+See [START_HERE.md](START_HERE.md) for detailed instructions.
 
 ## Prerequisites
 
@@ -98,11 +95,7 @@ Complete-CI-CD-Pipeline-Setup-Guide/
 │   ├── deploy-multi-region.sh             # Bash deployment script
 │   └── deploy-multi-region.ps1            # PowerShell deployment script
 └── docs/
-    ├── QUICK_START_MULTI_REGION.md        # Quick reference
-    ├── MULTI_REGION_DEPLOYMENT.md         # Comprehensive guide
-    ├── CHANGES_MULTI_REGION.md            # Change log
-    ├── DEPLOYMENT_SUMMARY.md              # Summary overview
-    └── STEP_BY_STEP_GUIDE.md              # Original single-region guide
+    └── START_HERE.md                      # Original single-region guide
 ```
 
 ## Deployment Commands
@@ -127,12 +120,4 @@ bash scripts/deploy-multi-region.sh
 
 ### Single Region Deployment (Legacy)
 
-See [STEP_BY_STEP_GUIDE.md](STEP_BY_STEP_GUIDE.md) for manual deployment steps.
-
-## Documentation Index
-
-| Document | Description | When to Use |
-|----------|-------------|-------------|
-| [DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md) | Overview & checklist | Understanding the setup |
-| [MULTI_REGION_DEPLOYMENT.md](MULTI_REGION_DEPLOYMENT.md) | Complete guide | Detailed information |
-| [CHANGES_MULTI_REGION.md](CHANGES_MULTI_REGION.md) | Change log | Migration from old setup |
+See [START_HERE.md](START_HERE.md) for manual deployment steps.
