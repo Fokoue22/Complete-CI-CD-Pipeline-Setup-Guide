@@ -1,14 +1,26 @@
-# CI/CD Pipeline with GitHub, AWS CodeBuild, CodePipeline & CloudFormation
+# 🚀 Complete Multi-Region CI/CD Pipeline
+
+[![AWS](https://img.shields.io/badge/AWS-CodePipeline-orange)](https://aws.amazon.com/codepipeline/)
+[![GitHub](https://img.shields.io/badge/GitHub-Integration-blue)](https://github.com)
+[![CloudFormation](https://img.shields.io/badge/IaC-CloudFormation-green)](https://aws.amazon.com/cloudformation/)
+[![Multi-Region](https://img.shields.io/badge/Deployment-Multi--Region-red)](https://aws.amazon.com/about-aws/global-infrastructure/)
+
+> **Production-ready CI/CD pipeline with multi-region deployment and manual approval gates**
+
+### 🎯 New Here? [START HERE →](START_HERE.md)
 
 ### Architecture Review
 ![Alt text](images/3stage-architecture-cloudformation.png)
 
-This project demonstrates a complete CI/CD pipeline using:
-- **GitHub** for source control
-- **AWS CodePipeline** for orchestration
-- **AWS CodeBuild** for build/test
-- **AWS CloudFormation** for infrastructure deployment
-- **Multi-Region Deployment** with manual approval
+This is a **complete, ready-to-use** CI/CD pipeline featuring:
+- ✅ **GitHub** for source control with webhook integration
+- ✅ **AWS CodePipeline** for orchestration
+- ✅ **AWS CodeBuild** for automated build/test
+- ✅ **AWS CloudFormation** for Infrastructure as Code
+- ✅ **Multi-Region Deployment** (Dev: us-east-1, Prod: us-west-1)
+- ✅ **Manual Approval** gate before production
+- ✅ **Complete Documentation** for every scenario
+- ✅ **Automated Deployment Scripts** (PowerShell & Bash)
 
 ## Architecture Flow
 
